@@ -61,7 +61,7 @@ BEGIN
 	@State AS 'State', 
 	@Zip AS 'PostalCode', 
 	NULL AS 'Phone', NULL AS 'Email',     
-	CASE(ccl.LocationID) WHEN 5 THEN 'Liberty Financial' WHEN 7 THEN 'Key Financial' ELSE 'Liberty Financial' END AS 'Payee',  
+	CASE(ccl.LocationID) WHEN 1 THEN 'Liberty Financial' WHEN 5 THEN 'Liberty Financial' WHEN 6 THEN 'Liberty Financial' ELSE 'Key Financial' END AS 'Payee',  
 	NULL AS 'Date', 
 	CONVERT(nvarchar,MAX(ccl.CheckID)) + CONVERT(nvarchar,ccl.LocationID) AS 'CheckNumber', 
 	SUM(ccl.Amount) AS 'Amount', 
