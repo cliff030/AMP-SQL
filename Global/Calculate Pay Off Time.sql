@@ -1,10 +1,10 @@
-IF OBJECT_ID('Custom_CalculatePayOffTime','FN') IS NOT NULL
+IF OBJECT_ID('Custom_CalculatePayOffTime') IS NOT NULL
 BEGIN
-	DROP FUNCTION dbo.Custom_CalculatePayOffTime
+	DROP FUNCTION Custom_CalculatePayOffTime
 END
 GO
 
-CREATE FUNCTION Custom_CalculatePayOffTime(
+CREATE FUNCTION [dbo].[Custom_CalculatePayOffTime](
 	@AvgInterest decimal(11,9),
 	@TotalDebt money,
 	@MonthlyPaymentAmount money
@@ -33,3 +33,4 @@ BEGIN
 	
 	RETURN @NumMonths
 END
+GO
