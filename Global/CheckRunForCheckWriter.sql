@@ -19,45 +19,33 @@ BEGIN
 	SET @TrustBankAccountID = 0
 	
 	DECLARE @RefundBankName nvarchar(50), @RefundRoutingNumber nvarchar(9), @RefundAccountNumber nvarchar(50), @RefundBankCity nvarchar(20), @RefundBankState nvarchar(2)
-	
-	SET @RefundBankName = 'Synovus'
-	SET @RefundBankCity = 'Oldsmar'
-	SET @RefundBankState = 'FL'
-	
-	IF DB_NAME() = 'CSDATA8'
-	BEGIN
-		SET @RefundRoutingNumber = '063114166'
-		set @RefundAccountNumber = '1004962724'
-	END
-	
-	IF DB_NAME() = 'CSDATA8_INC'
-	BEGIN
-		SET @RefundRoutingNumber = '063114166'
-		SET @RefundAccountNumber = '1004962708'
-	END
-	
-	IF DB_NAME() = 'CSDATA8_FFN'
-	BEGIN
-		SET @RefundRoutingNumber = '063114166'
-		SET @RefundAccountNumber = '1004962716'
-	END
 
-	IF DB_NAME() = 'CSDATA8_KAR'
-	BEGIN
-		SET @RefundRoutingNumber = (SELECT OriginatorID FROM BankAccounts WHERE BankAccountID = @TrustBankAccountID)
-		SET @RefundAccountNumber = (SELECT AccountNumber FROM BankAccounts WHERE BankAccountID = @TrustBankAccountID)
-	END
-	
+	SET @RefundBankName = (SELECT BankName FROM Custom_GetRefundAccount())
+	SET @RefundBankCity = (SELECT BankCity FROM Custom_GetRefundAccount())
+	SET @RefundBankState = (SELECT BankState FROM Custom_GetRefundAccount())
+	SET @RefundAccountNumber = (SELECT AccountNumber FROM Custom_GetRefundAccount())
+	SET @RefundRoutingNumber = (SELECT RoutingNumber FROM Custom_GetRefundAccount())
+
+	DECLARE @SystemTable table (
+		CompanyName nvarchar(512),
+		Address1 nvarchar(200),
+		Address2 nvarchar(10) null,
+		City nvarchar(100),
+		[State] nvarchar(100),
+		Zip nvarchar(20)
+	)
+	INSERT INTO @SystemTable ( CompanyName, Address1, Address2, City, [State], Zip ) ( select * from dbo.Custom_GetAMPAddress() )
+
 	DECLARE @CompanyName nvarchar(150)    
 	DECLARE @Address1 nvarchar(50)    
 	DECLARE @City nvarchar(20)    
 	DECLARE @State nvarchar(2)    
 	DECLARE @Zip nvarchar(15)      
-	SET @CompanyName = (SELECT REPLACE(CompanyName,',','') FROM SystemTable)    
-	SET @Address1 = (SELECT REPLACE(Address1,'-','') FROM SystemTable)    
-	SET @City = (SELECT City FROM SystemTable)    
-	SET @State = (SELECT State FROM SystemTable)    
-	SET @Zip = (SELECT ZIP FROM SystemTable)                 
+	SET @CompanyName = (SELECT REPLACE(CompanyName,',','') FROM @SystemTable WHERE CompanyName LIKE 'Account Management Plus%')    
+	SET @Address1 = (SELECT REPLACE(Address1,'-','') FROM @SystemTable WHERE CompanyName LIKE 'Account Management Plus%')    
+	SET @City = (SELECT City FROM @SystemTable WHERE CompanyName LIKE 'Account Management Plus%')    
+	SET @State = (SELECT State FROM @SystemTable WHERE CompanyName LIKE 'Account Management Plus%')    
+	SET @Zip = (SELECT ZIP FROM @SystemTable WHERE CompanyName LIKE 'Account Management Plus%')                 
 	
 	IF @BankAccountID = @TrustBankAccountID
 	BEGIN  
