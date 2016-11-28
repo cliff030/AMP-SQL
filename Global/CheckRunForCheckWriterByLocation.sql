@@ -98,7 +98,7 @@ BEGIN
 		ba.OriginatorID AS 'RoutingNumber',  
 		ba.AccountNumber AS 'AccountNumber', 
 		NULL AS 'CustomRouting', NULL AS 'FractionCode', NULL AS 'CreditCardNumber',  NULL AS 'ExpirationDate', NULL AS 'DeliveryDate', NULL AS 'DeliveryStatus', NULL AS 'ReIssue', NULL AS 'ReIssueDay',  NULL AS 'User1', NULL AS 'User2', NULL AS 'Notes', 
-		'For the benefit of '  + c.FirstName + ' ' + c.LastName AS 'Memo', 
+		c.FirstName + ' ' + c.LastName + ' ' + cc.AccountNumber AS 'Memo',
 		NULL AS 'Printed', NULL AS 'EnteredBy', NULL AS 'DateEntered',  NULL AS 'ModifiedBy', NULL AS 'DateModified'     
 		FROM Checks AS cks   
 		INNER JOIN Payments AS p    
@@ -109,7 +109,9 @@ BEGIN
 		INNER JOIN BankAccounts AS ba       
 			ON ba.BankAccountID = p.BankAccountID   
 		INNER JOIN Creditors AS cred    
-			ON cks.CreditorID = cred.CreditorID   
+			ON cks.CreditorID = cred.CreditorID
+		LEFT JOIN ClientCred AS cc
+			ON p.ClientCredID = cc.ClientCredID   
 		WHERE cks.Voided = 0    
 		AND cks.CheckRunID = @CheckRunID    
 		AND cks.BankAccountID = @BankAccountID  
